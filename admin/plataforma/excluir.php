@@ -14,7 +14,7 @@
         $excluir = $prepara->execute($params);
 
         if ($excluir) {
-            echo '<META HTTP-EQUIV="Refresh" Content="0; URL=/admin/plataforma/listar.php?msg=Plataforma excluida com sucesso!">';
+            echo '<META HTTP-EQUIV="Refresh" CHARSET=UTF-8 Content="0; URL=/admin/plataforma/listar.php?msg=Plataforma excluida com sucesso!">';
         	exit();
         }
 	}

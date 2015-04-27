@@ -25,7 +25,7 @@
             $inserir = $prepara->execute($params);
 
             if($inserir) {
-              echo '<META HTTP-EQUIV="Refresh" Content="0; URL=/admin/tipojogo/listar.php?msg=Tipo cadastrado com sucesso!">';
+              echo '<META HTTP-EQUIV="Refresh" CHARSET=UTF-8 Content="0; URL=/admin/tipojogo/listar.php?msg=Tipo cadastrado com sucesso!">';
               exit();
             } else {
               $erro = "Ocorreu um erro com o cadastro, tente novamente!";

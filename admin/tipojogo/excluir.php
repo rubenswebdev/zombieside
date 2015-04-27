@@ -14,7 +14,7 @@
         $excluir = $prepara->execute($params);
 
         if ($excluir) {
-            echo '<META HTTP-EQUIV="Refresh" Content="0; URL=/admin/tipojogo/listar.php?msg=Tipo excluido com sucesso!">';
+            echo '<META HTTP-EQUIV="Refresh" CHARSET=UTF-8 Content="0; URL=/admin/tipojogo/listar.php?msg=Tipo excluido com sucesso!">';
         	exit();
         }
 	}

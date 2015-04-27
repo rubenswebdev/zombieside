@@ -16,7 +16,7 @@
         $atualizar = $prepara->execute($params);
 
         if ($atualizar) {
-            echo '<META HTTP-EQUIV="Refresh" Content="0; URL=/admin/tipojogo/listar.php?msg=Tipo '.$acao.' com sucesso!">';
+            echo '<META HTTP-EQUIV="Refresh" CHARSET=UTF-8 Content="0; URL=/admin/tipojogo/listar.php?msg=Tipo '.$acao.' com sucesso!">';
         	exit();
         }
 	}

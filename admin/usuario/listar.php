@@ -49,12 +49,12 @@
                     </a>
                     
                     <?php if ($usuario['ativo']) { ?>
-                    <a title="Desativar usuário" class="btn btn-warning" href="/admin/usuario/ativa_desativa.php?id=<?php echo $usuario['id']; ?>acao=desativado">
+                    <a title="Desativar usuário" class="btn btn-warning" href="/admin/usuario/ativa_desativa.php?id=<?php echo $usuario['id']; ?>&acao=desativado">
                         <span class="glyphicon glyphicon glyphicon-remove" aria-hidden="true"></span>
                     </a>
                     <?php } else { ?>
 
-                    <a title="Ativar usuário" class="btn btn-success" href="/admin/usuario/ativa_desativa.php?id=<?php echo $usuario['id']; ?>acao=ativado">
+                    <a title="Ativar usuário" class="btn btn-success" href="/admin/usuario/ativa_desativa.php?id=<?php echo $usuario['id']; ?>&acao=ativado">
                         <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
                     </a>
                     <?php } ?>

@@ -39,7 +39,7 @@
             $inserir = $prepara->execute($params);
 
             if($inserir) {
-              echo '<META HTTP-EQUIV="Refresh" Content="0; URL=/admin/jogo/listar.php?msg=Jogo cadastrado com sucesso!">';
+              echo '<META HTTP-EQUIV="Refresh" CHARSET=UTF-8 Content="0; URL=/admin/jogo/listar.php?msg=Jogo cadastrado com sucesso!">';
               exit();
             } else {
               $erro = "Ocorreu um erro com o cadastro, tente novamente!";

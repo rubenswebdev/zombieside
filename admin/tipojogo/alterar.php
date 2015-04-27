@@ -33,7 +33,7 @@
         $atualizar = $prepara->execute($params);
 
         if($atualizar) {
-          echo '<META HTTP-EQUIV="Refresh" Content="0; URL=/admin/tipojogo/listar.php?msg=Tipo alterado com sucesso!">';
+          echo '<META HTTP-EQUIV="Refresh"  CHARSET=UTF-8 Content="0; URL=/admin/tipojogo/listar.php?msg=Tipo alterado com sucesso!">';
           exit();
         } else {
           $erro = "Ocorreu um erro com o cadastro, tente novamente!";
