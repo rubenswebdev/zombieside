@@ -3,7 +3,7 @@ session_start();
 ini_set('display_errors', 'ON');
 error_reporting(E_ALL);
  try {
-    $conexao = new PDO("pgsql:host=localhost dbname=zombieside user=postgres password=ruhs2 port=5432");
+    $conexao = new PDO("pgsql:host=localhost dbname=zs user=postgres password=ruhs2 port=5432");
 
     $conexao->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
  } catch (PDOException  $e) {
