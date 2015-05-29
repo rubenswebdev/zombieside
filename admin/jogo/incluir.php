@@ -11,6 +11,7 @@
     $tipos = listarTiposAtivos($conexao);
 
     if (count($_POST)) {
+
         $nome = $_POST['nome'];
         $requisitos = $_POST['requisitos'];
 
@@ -21,29 +22,62 @@
         $id_plataforma = $_POST['plataforma'];
         $ativo = !isset($_POST['ativo']) ? 'false' : 'true';
 
-            $sql = "INSERT INTO jogo (nome, requisitos, data_lancamento, ativo, descricao, id_tipo, id_plataforma) 
-                    VALUES (:nome, :requisitos, :data_lancamento, :ativo, :descricao, :id_tipo, :id_plataforma)";
+        $sql = "INSERT INTO jogo (nome, requisitos, data_lancamento, ativo, descricao, id_tipo, id_plataforma) 
+                VALUES (:nome, :requisitos, :data_lancamento, :ativo, :descricao, :id_tipo, :id_plataforma)";
 
-            $prepara = $conexao->prepare($sql);
+        $prepara = $conexao->prepare($sql);
 
-            $params = array(
-                            ':nome' => $nome,
-                            ':requisitos' => $requisitos,
-                            ':data_lancamento' => $data_lancamento,
-                            ':ativo' => $ativo,
-                            ':descricao' => $descricao,
-                            ':id_tipo' => $id_tipo,
-                            ':id_plataforma' => $id_plataforma
-                      );
+        $params = array(
+                        ':nome' => $nome,
+                        ':requisitos' => $requisitos,
+                        ':data_lancamento' => $data_lancamento,
+                        ':ativo' => $ativo,
+                        ':descricao' => $descricao,
+                        ':id_tipo' => $id_tipo,
+                        ':id_plataforma' => $id_plataforma
+                  );
 
-            $inserir = $prepara->execute($params);
+        $inserir = $prepara->execute($params);
 
-            if($inserir) {
-              echo '<META HTTP-EQUIV="Refresh" CHARSET=UTF-8 Content="0; URL=/admin/jogo/listar.php?msg=Jogo cadastrado com sucesso!">';
-              exit();
-            } else {
-              $erro = "Ocorreu um erro com o cadastro, tente novamente!";
+        $id_jogo = $conexao->lastInsertId('jogo_id_seq');
+
+
+        
+        //IMAGENS
+        foreach ($_FILES["imagens"]["error"] as $key => $error) {
+            if (!$error) {
+                $tmp_name = $_FILES["imagens"]["tmp_name"][$key];
+                $name = random_string(10).'_'.$_FILES["imagens"]["name"][$key];
+                move_uploaded_file($tmp_name, "../../uploads/jogos/$name");
+
+                $sqlImgs = "INSERT INTO imagem (slide, data_enviado, caminho, ativo, id_jogo, excluido) 
+                VALUES (:slide, :data_enviado, :caminho, :ativo, :id_jogo, :excluido)";
+                $preparaImgs = $conexao->prepare($sqlImgs);
+
+                $data_enviado = new Datetime;
+                $data_enviado = $data_enviado->format('Y-m-d');
+
+                $paramsImgs = array(
+                                ':slide' => 'true',
+                                ':data_enviado' => $data_enviado,
+                                ':caminho' => "../../uploads/jogos/$name",
+                                ':ativo' => 'true',
+                                ':id_jogo' => $id_jogo,
+                                ':excluido' => 'false'
+                          );
+                $inserirImg = $preparaImgs->execute($paramsImgs);
+
             }
+        }
+        //END
+
+
+        if($inserir) {
+          echo '<META HTTP-EQUIV="Refresh" CHARSET=UTF-8 Content="0; URL=/admin/jogo/listar.php?msg=Jogo cadastrado com sucesso!">';
+          exit();
+        } else {
+          $erro = "Ocorreu um erro com o cadastro, tente novamente!";
+        }
 
 
     }
@@ -65,7 +99,7 @@
         </div>
         <?php } ?>
        
-        <form action="/admin/jogo/incluir.php" method="POST" role="form">
+        <form action="/admin/jogo/incluir.php" method="POST" enctype="multipart/form-data" role="form">
           <legend>Novo Jogo</legend>
         
           <div class="form-group">
@@ -102,18 +136,23 @@
             <label for="">Descrição</label>
             <textarea name="descricao" id="descricao" cols="30" rows="10"></textarea>
           </div>
-         
+          <div class="form-group">
+            <label for="">Imagens</label>
+            <input name="imagens[]" type="file" multiple>
+          </div>
+           
           <div class="checkbox">
             <label>
-              <input <?php if (isset($_POST['ativo'])) echo 'checked'; ?> name="ativo" type="checkbox" value="1">
+              <input checked name="ativo" type="checkbox" value="1">
               Ativo
             </label>
           </div>
         
           
         
-          <button type="submit" class="btn btn-primary">Cadastrar</button>
+          <button type="submit"  id="submit-all" class="btn btn-primary">Cadastrar</button>
         </form>
+
     </div>
   <?php 
     include '../footer.php';

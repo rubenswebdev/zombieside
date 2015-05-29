@@ -5,7 +5,7 @@
 	$id = $_GET['id'];
 
 	if ((int)$id > 0) {
-		$sql = "UPDATE usuario set excluido = true WHERE id = :id";
+		$sql = "UPDATE jogo set excluido = true WHERE id = :id";
 
         $prepara = $conexao->prepare($sql);
 
@@ -14,7 +14,7 @@
         $excluir = $prepara->execute($params);
 
         if ($excluir) {
-            echo '<META HTTP-EQUIV="Refresh" CHARSET=UTF-8 Content="0; URL=/admin/usuario/listar.php?msg=Usuário excluido com sucesso!">';
+            echo '<META HTTP-EQUIV="Refresh" CHARSET=UTF-8 Content="0; URL=/admin/jogo/listar.php?msg=Jogo excluido com sucesso!">';
         	exit();
         }
 	}

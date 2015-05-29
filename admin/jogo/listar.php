@@ -58,23 +58,23 @@
                   <td><?php echo $jogo['tipo'] ?></td>
                   <td><?php echo $jogo['ativo'] == 1 ? 'Sim' : 'Não'; ?></td>
                   <td>
-                    <!-- <a title="Alterar jogo" class="btn btn-info" href="/admin/jogo/alterar.php?id=<?php echo $jogo['id']; ?>">
+                    <a title="Alterar jogo" class="btn btn-info" href="/admin/jogo/alterar.php?id=<?php echo $jogo['id']; ?>">
                         <span class="glyphicon glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                    </a> -->
+                    </a>
                     
                     <?php if ($jogo['ativo']) { ?>
-                    <!-- <a title="Desativar jogo" class="btn btn-warning" href="/admin/jogo/ativa_desativa.php?id=<?php echo $jogo['id']; ?>&acao=desativado">
+                    <a title="Desativar jogo" class="btn btn-warning" href="/admin/jogo/ativa_desativa.php?id=<?php echo $jogo['id']; ?>&acao=desativado">
                         <span class="glyphicon glyphicon glyphicon-remove" aria-hidden="true"></span>
-                    </a> -->
+                    </a>
                     <?php } else { ?>
 
-                    <!-- <a title="Ativar jogo" class="btn btn-success" href="/admin/jogo/ativa_desativa.php?id=<?php echo $jogo['id']; ?>&acao=ativado">
+                    <a title="Ativar jogo" class="btn btn-success" href="/admin/jogo/ativa_desativa.php?id=<?php echo $jogo['id']; ?>&acao=ativado">
                         <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
-                    </a> -->
+                    </a>
                     <?php } ?>
-                    <!-- <a title="Excluir jogo" class="btn btn-danger" href="/admin/jogo/excluir.php?id=<?php echo $jogo['id']; ?>">
+                    <a title="Excluir jogo" class="btn btn-danger" href="/admin/jogo/excluir.php?id=<?php echo $jogo['id']; ?>">
                         <span class="glyphicon glyphicon glyphicon-trash" aria-hidden="true"></span>
-                    </a> -->
+                    </a>
                   </td>
               </tr>
            <?php } ?>
