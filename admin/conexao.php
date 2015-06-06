@@ -41,29 +41,50 @@ function listarUsuariosAtivos($conexao) {
 }
 
 
-function listarPlataformas($conexao) {
+function listarPlataformas($conexao, $paginarAcada) {
     //Monta o select
-    $sql = "SELECT * FROM plataforma WHERE excluido = false ORDER BY id";
+ 
+    $sql = "SELECT *, (SELECT COUNT(*) FROM plataforma WHERE excluido = false) as total FROM plataforma WHERE excluido = false ORDER BY id  LIMIT :limit OFFSET :offset";
 
     $prepara = $conexao->prepare($sql);
-    $prepara->execute();
+
+    if (isset($_GET['pagina'])) {
+      $offset = $_GET['pagina'] * $paginarAcada;
+    }
+
+    $params = array(
+                ':offset' => (int)@$offset,
+                ':limit' => $paginarAcada
+    );
+
+    $prepara->execute($params);
 
     return $prepara->fetchAll();
 }
 
-function listarTipos($conexao) {
+function listarTipos($conexao, $paginarAcada) {
     //Monta o select
-    $sql = "SELECT * FROM tipo_jogo WHERE excluido = false ORDER BY id";
+    $sql = "SELECT *, (SELECT COUNT(*) FROM tipo_jogo WHERE excluido = false) as total FROM tipo_jogo WHERE excluido = false ORDER BY id  LIMIT :limit OFFSET :offset";
 
     $prepara = $conexao->prepare($sql);
-    $prepara->execute();
+     
+    if (isset($_GET['pagina'])) {
+      $offset = $_GET['pagina'] * $paginarAcada;
+    }
+
+    $params = array(
+                ':offset' => (int)@$offset,
+                ':limit' => $paginarAcada
+    );
+
+    $prepara->execute($params);
 
     return $prepara->fetchAll();
 }
 
-function listarUsuarios($conexao) {
+function listarUsuarios($conexao, $paginarAcada) {
 	//Monta o select
-    $sql = "SELECT * FROM usuario WHERE excluido = false ORDER BY id";
+    $sql = "SELECT *, (SELECT COUNT(*) FROM usuario WHERE excluido = false) as total FROM usuario WHERE excluido = false ORDER BY id";
 
     $prepara = $conexao->prepare($sql);
     $prepara->execute();
@@ -115,6 +136,18 @@ function random_string($length) {
     }
 
     return $key;
+}
+
+
+function verificaEmail($conexao, $email) {
+    $sql = "SELECT * FROM usuario WHERE email = :email";
+    $prepara = $conexao->prepare($sql);
+
+    $params = array(':email' => $email);
+
+    $prepara->execute($params);
+    
+    return $prepara->fetch();
 }
 
 ?>

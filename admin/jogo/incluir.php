@@ -18,12 +18,11 @@
         $data_lancamento = $_POST['data_lancamento'];
 
         $descricao = $_POST['descricao'];
-        $id_tipo = $_POST['tipo'];
-        $id_plataforma = $_POST['plataforma'];
+       
         $ativo = !isset($_POST['ativo']) ? 'false' : 'true';
 
-        $sql = "INSERT INTO jogo (nome, requisitos, data_lancamento, ativo, descricao, id_tipo, id_plataforma) 
-                VALUES (:nome, :requisitos, :data_lancamento, :ativo, :descricao, :id_tipo, :id_plataforma)";
+        $sql = "INSERT INTO jogo (nome, requisitos, data_lancamento, ativo, descricao) 
+                VALUES (:nome, :requisitos, :data_lancamento, :ativo, :descricao)";
 
         $prepara = $conexao->prepare($sql);
 
@@ -32,14 +31,41 @@
                         ':requisitos' => $requisitos,
                         ':data_lancamento' => $data_lancamento,
                         ':ativo' => $ativo,
-                        ':descricao' => $descricao,
-                        ':id_tipo' => $id_tipo,
-                        ':id_plataforma' => $id_plataforma
+                        ':descricao' => $descricao
                   );
 
         $inserir = $prepara->execute($params);
 
         $id_jogo = $conexao->lastInsertId('jogo_id_seq');
+
+        if(isset($_POST['plataformas']) and count($_POST['plataformas']))
+        foreach ($_POST['plataformas'] as $platId) {
+            $sql = "INSERT INTO tipo_plataforma_jogo (id_jogo, id_plataforma) 
+                VALUES (:id_jogo, :id_plataforma)";
+            
+            $prepara = $conexao->prepare($sql);
+            
+            $params = array(
+                ':id_jogo' => $id_jogo,
+                ':id_plataforma' => $platId
+            );
+
+            $inserir = $prepara->execute($params);
+        }
+         if(isset($_POST['tipos']) and count($_POST['tipos']))
+        foreach ($_POST['tipos'] as $tipoId) {
+            $sql = "INSERT INTO jogo_tipo_jogo (id_jogo, id_tipo_jogo) 
+                VALUES (:id_jogo, :id_tipo_jogo)";
+            
+            $prepara = $conexao->prepare($sql);
+            
+            $params = array(
+                ':id_jogo' => $id_jogo,
+                ':id_tipo_jogo' => $tipoId
+            );
+
+            $inserir = $prepara->execute($params);
+        }
 
 
         
@@ -60,7 +86,7 @@
                 $paramsImgs = array(
                                 ':slide' => 'true',
                                 ':data_enviado' => $data_enviado,
-                                ':caminho' => "../../uploads/jogos/$name",
+                                ':caminho' => "uploads/jogos/$name",
                                 ':ativo' => 'true',
                                 ':id_jogo' => $id_jogo,
                                 ':excluido' => 'false'
@@ -70,8 +96,7 @@
             }
         }
         //END
-
-
+    
         if($inserir) {
           echo '<META HTTP-EQUIV="Refresh" CHARSET=UTF-8 Content="0; URL=/admin/jogo/listar.php?msg=Jogo cadastrado com sucesso!">';
           exit();
@@ -111,21 +136,27 @@
             <input type="date" value="<?php echo @$_POST['data_lancamento']; ?>" required class="form-control" id="data_lancamento" name="data_lancamento" placeholder="Data de Lançamento">
           </div>
           <div class="form-group">
-            <label for="">Plataforma</label>
-            <select required class="form-control" name="plataforma" id="plataforma">
-              <?php foreach ($plataformas as $plat) { ?>
-                <option value="<?php echo $plat['id'] ?>"><?php echo $plat['nome'] ?></option>
-              <?php } ?>
-            </select>
+            <label for="">Plataformas</label>
+            <?php foreach ($plataformas as $plat) { ?>
+            <div class="checkbox">
+              <label>
+                <input name="plataformas[]" value="<?php echo $plat['id'] ?>" type="checkbox"> <?php echo $plat['nome']; ?>
+              </label>
+            </div>
+            <?php } ?>
+
           </div>
+
 
           <div class="form-group">
             <label for="">Tipo</label>
-            <select required class="form-control" name="tipo" id="tipo">
-              <?php foreach ($tipos as $tipo) { ?>
-                <option value="<?php echo $tipo['id'] ?>"><?php echo $tipo['nome'] ?></option>
-              <?php } ?>
-            </select>
+             <?php foreach ($tipos as $tipo) { ?>
+            <div class="checkbox">
+              <label>
+                <input name="tipos[]" value="<?php echo $tipo['id'] ?>" type="checkbox"> <?php echo $tipo['nome']; ?>
+              </label>
+            </div>
+            <?php } ?>
           </div>
           <div class="form-group">
             <label for="">Requisitos</label>

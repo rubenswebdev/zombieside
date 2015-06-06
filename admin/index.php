@@ -34,7 +34,32 @@
               </tr>
             </tbody>
           </table>
+          <div style="height: 200px" id="placeholder" class="demo-placeholder"></div>
         </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        
+        <script>
+          $(function() {
+
+            var data = [ ["Usuários", <?php echo $usuarios['qtd'] ?>], ["Plataformas", <?php echo $plataformas['qtd'] ?>], ["Tipos de jogos", <?php echo $tipos['qtd'] ?>], ["Jogos", <?php echo $jogos['qtd'] ?>] ];
+
+            $.plot("#placeholder", [ data ], {
+              series: {
+                bars: {
+                  show: true,
+                  barWidth: 0.6,
+                  align: "center"
+                }
+              },
+              xaxis: {
+                mode: "categories",
+                tickLength: 0
+              }
+            });
+
+
+          });
+        </script>
   <?php 
     include 'footer.php';
   ?>

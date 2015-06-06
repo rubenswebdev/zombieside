@@ -7,15 +7,36 @@
 
     include '../conexao.php';
 
+    $paginarAcada = 10;
+
     //Monta o select
-    $sql = "SELECT j.*, p.nome as plataforma, t.nome as tipo
-            FROM jogo j 
-            INNER JOIN plataforma p ON p.id = j.id_plataforma 
-            INNER JOIN tipo_jogo t ON t.id = j.id_tipo 
-            WHERE j.excluido = false ORDER BY j.nome;";
+    $sql = "SELECT j.*, (SELECT COUNT(*) FROM jogo WHERE excluido = false) as total,
+              (SELECT string_agg(p.nome, ', ') 
+                FROM tipo_plataforma_jogo tp 
+                INNER JOIN plataforma p ON p.id = tp.id_plataforma 
+                WHERE tp.id_jogo = j.id) as plataformas,
+              (SELECT string_agg(tj.nome, ', ') 
+                FROM jogo_tipo_jogo jtj 
+                INNER JOIN tipo_jogo tj ON tj.id = jtj.id_tipo_jogo
+                WHERE jtj.id_jogo = j.id) as tipos 
+              FROM jogo j 
+            WHERE j.excluido = false
+            GROUP BY j.id
+            ORDER BY j.nome
+            LIMIT :limit OFFSET :offset;";
 
     $prepara = $conexao->prepare($sql);
-    $prepara->execute();
+
+    if (isset($_GET['pagina'])) {
+      $offset = $_GET['pagina'] * $paginarAcada;
+    }
+
+    $params = array(
+                ':offset' => (int)@$offset,
+                ':limit' => $paginarAcada
+    );
+
+    $prepara->execute($params);
 
     $jogos = $prepara->fetchAll();
 
@@ -39,8 +60,8 @@
               <tr>
                   <th>Nome</th>
                   <th>Data de Lançamento</th>
-                  <th>Plataforma</th>
-                  <th>Tipo</th>
+                  <th>Plataformas</th>
+                  <th>Tipos</th>
                   <th>Ativo</th>
                   <th>Opções</th>
               </tr>
@@ -54,8 +75,8 @@
                       $data = date_create_from_format('Y-m-d', $jogo['data_lancamento']);
                    ?>
                   <td><?php echo date_format($data, 'd/m/Y');?></td>
-                  <td><?php echo $jogo['plataforma'] ?></td>
-                  <td><?php echo $jogo['tipo'] ?></td>
+                  <td><?php echo $jogo['plataformas'] ?></td>
+                  <td><?php echo $jogo['tipos'] ?></td>
                   <td><?php echo $jogo['ativo'] == 1 ? 'Sim' : 'Não'; ?></td>
                   <td>
                     <a title="Alterar jogo" class="btn btn-info" href="/admin/jogo/alterar.php?id=<?php echo $jogo['id']; ?>">
@@ -80,6 +101,44 @@
            <?php } ?>
           </tbody>
       </table>
+      <?php 
+        $total = $jogos[0]['total'];
+        $paginas = $total / $paginarAcada;
+
+
+        $totalDaPagina = count($jogos);
+        $totalDoOffset = (((int)@$_GET['pagina'] + 1) * $paginarAcada);
+
+
+        if ($totalDoOffset > $total ) {
+          $totalDoOffset =  $total;
+        }
+
+        echo 'Exibindo '. $totalDoOffset .' de '.$total.' resultados';
+       ?>
+      <nav>
+          <ul class="pagination">
+          
+            <li class="<?php if ((int)@$_GET['pagina'] - 1 < 0) echo 'disabled'; ?>">
+              <a href="<?php echo (int)@$_GET['pagina'] - 1 < 0 ? 'javascript:' : '?pagina=' . ((int)@$_GET['pagina'] - 1) ?>" aria-label="Anterior">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+     
+            <?php for ($i=0; $i < $paginas; $i++) { ?>
+              <li class="<?php echo (int)@$_GET['pagina'] == $i ? 'active' : '' ?>"><a href="?pagina=<?php echo $i ?>"><?php echo $i+1 ?></a></li>
+            <?php } ?>
+           
+            
+            <li class="<?php if ((int)@$_GET['pagina'] + 1 > $paginas) echo 'disabled'; ?>">
+              <a href="<?php echo (int)@$_GET['pagina'] + 1 > $paginas ? 'javascript:' : '?pagina=' . ((int)@$_GET['pagina'] + 1) ?>"
+                aria-label="Próxima">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          
+          </ul>
+        </nav>
     </div>
   <?php 
     include '../footer.php';

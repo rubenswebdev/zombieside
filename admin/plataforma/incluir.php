@@ -64,7 +64,7 @@
 
           <div class="checkbox">
             <label>
-              <input <?php if (isset($_POST['ativo'])) echo 'checked'; ?> name="ativo" type="checkbox" value="1">
+              <input checked name="ativo" type="checkbox" value="1">
               Ativo
             </label>
           </div>

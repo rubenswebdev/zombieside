@@ -6,8 +6,8 @@
     include '../menu_lateral.php';
 
     include '../conexao.php';
-    
-    $usuarios = listarUsuarios($conexao);
+     $paginarAcada = 10;
+    $usuarios = listarUsuarios($conexao, $paginarAcada);
 
 ?>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -66,6 +66,46 @@
            <?php } ?>
           </tbody>
       </table>
+       <!-- PAGINACAO -->
+      <?php 
+        $total = $usuarios[0]['total'];
+        $paginas = $total / $paginarAcada;
+
+
+        $totalDaPagina = count($usuarios);
+        $totalDoOffset = (((int)@$_GET['pagina'] + 1) * $paginarAcada);
+
+
+        if ($totalDoOffset > $total ) {
+          $totalDoOffset =  $total;
+        }
+
+        echo 'Exibindo '. $totalDoOffset .' de '.$total.' resultados';
+       ?>
+      <nav>
+          <ul class="pagination">
+          
+            <li class="<?php if ((int)@$_GET['pagina'] - 1 < 0) echo 'disabled'; ?>">
+              <a href="<?php echo (int)@$_GET['pagina'] - 1 < 0 ? 'javascript:' : '?pagina=' . ((int)@$_GET['pagina'] - 1) ?>" aria-label="Anterior">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+     
+            <?php for ($i=0; $i < $paginas; $i++) { ?>
+              <li class="<?php echo (int)@$_GET['pagina'] == $i ? 'active' : '' ?>"><a href="?pagina=<?php echo $i ?>"><?php echo $i+1 ?></a></li>
+            <?php } ?>
+           
+            
+            <li class="<?php if ((int)@$_GET['pagina'] + 1 > $paginas) echo 'disabled'; ?>">
+              <a href="<?php echo (int)@$_GET['pagina'] + 1 > $paginas ? 'javascript:' : '?pagina=' . ((int)@$_GET['pagina'] + 1) ?>"
+                aria-label="Próxima">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          
+          </ul>
+        </nav>
+      <!-- FINAL PAGINACAO -->
     </div>
   <?php 
     include '../footer.php';

@@ -13,12 +13,25 @@
 
     $id = $_GET['id'];
 
-    $sql = "SELECT * FROM jogo WHERE id=:id";
+    $sql = "SELECT j.*,
+              (SELECT string_agg(p.id::text, ',') 
+                FROM tipo_plataforma_jogo tp 
+                INNER JOIN plataforma p ON p.id = tp.id_plataforma 
+                WHERE tp.id_jogo = j.id) as plataformas,
+              (SELECT string_agg(tj.id::text, ',') 
+                FROM jogo_tipo_jogo jtj 
+                INNER JOIN tipo_jogo tj ON tj.id = jtj.id_tipo_jogo
+                WHERE jtj.id_jogo = j.id) as tipos 
+              FROM jogo j 
+            WHERE j.excluido = false and j.id = :id;";
 
     $prepara = $conexao->prepare($sql);
     $prepara->execute(array(':id' => $id));
     
     $jogo = $prepara->fetchObject();
+
+    $plataformasId = explode(',', $jogo->plataformas);
+    $tiposId = explode(',', $jogo->tipos);
 
     // imagens
     $sqlImg = "SELECT * FROM imagem WHERE id_jogo = :id_jogo AND excluido = false";
@@ -29,7 +42,7 @@
     $imagens = $preparaImg->fetchAll();
 
     $data_lancamento = new Datetime($jogo->data_lancamento);
-    $data_lancamento = $data_lancamento->format('d/m/Y');
+    $data_lancamento = $data_lancamento->format('Y-m-d');
 
     if (count($_POST)) {
         $nome = $_POST['nome'];
@@ -37,12 +50,11 @@
 
         $data_lancamento = $_POST['data_lancamento'];
 
+
         $descricao = $_POST['descricao'];
-        $id_tipo = $_POST['tipo'];
-        $id_plataforma = $_POST['plataforma'];
         $ativo = !isset($_POST['ativo']) ? 'false' : 'true';
 
-        $sql = "UPDATE jogo set nome=:nome, requisitos=:requisitos, data_lancamento=:data_lancamento, ativo=:ativo, descricao=:descricao, id_tipo=:id_tipo, id_plataforma=:id_plataforma
+        $sql = "UPDATE jogo set nome=:nome, requisitos=:requisitos, data_lancamento=:data_lancamento, ativo=:ativo, descricao=:descricao
         WHERE id = :id";
 
         $prepara = $conexao->prepare($sql);
@@ -53,8 +65,6 @@
                         ':data_lancamento' => $data_lancamento,
                         ':ativo' => $ativo,
                         ':descricao' => $descricao,
-                        ':id_tipo' => $id_tipo,
-                        ':id_plataforma' => $id_plataforma,
                         ':id' => $jogo->id
                   );
 
@@ -63,6 +73,50 @@
 
          $id_jogo = $jogo->id;
 
+
+      $sql = "DELETE FROM tipo_plataforma_jogo where id_jogo = :id_jogo";
+      $prepara = $conexao->prepare($sql);
+      $params = array(
+              ':id_jogo' => $id_jogo
+      );
+      $prepara->execute($params);
+
+
+      $sql = "DELETE FROM jogo_tipo_jogo where id_jogo = :id_jogo";
+      $prepara = $conexao->prepare($sql);
+      $params = array(
+              ':id_jogo' => $id_jogo
+      );
+      $prepara->execute($params);
+
+  
+       foreach ($_POST['plataformas'] as $platId) {
+            $sql = "INSERT INTO tipo_plataforma_jogo (id_jogo, id_plataforma) 
+                VALUES (:id_jogo, :id_plataforma)";
+            
+            $prepara = $conexao->prepare($sql);
+            
+            $params = array(
+                ':id_jogo' => $id_jogo,
+                ':id_plataforma' => $platId
+            );
+
+            $inserir = $prepara->execute($params);
+        }
+        if(isset($_POST['tipos']) and count($_POST['tipos']))  
+        foreach ($_POST['tipos'] as $tipoId) {
+            $sql = "INSERT INTO jogo_tipo_jogo (id_jogo, id_tipo_jogo) 
+                VALUES (:id_jogo, :id_tipo_jogo)";
+            
+            $prepara = $conexao->prepare($sql);
+            
+            $params = array(
+                ':id_jogo' => $id_jogo,
+                ':id_tipo_jogo' => $tipoId
+            );
+
+            $inserir = $prepara->execute($params);
+        }
 
         
         //IMAGENS
@@ -82,7 +136,7 @@
                 $paramsImgs = array(
                                 ':slide' => 'true',
                                 ':data_enviado' => $data_enviado,
-                                ':caminho' => "../../uploads/jogos/$name",
+                                ':caminho' => "uploads/jogos/$name",
                                 ':ativo' => 'true',
                                 ':id_jogo' => $id_jogo,
                                 ':excluido' => 'false'
@@ -132,21 +186,25 @@
             <input type="date" value="<?php echo $data_lancamento ?>" required class="form-control" id="data_lancamento" name="data_lancamento" placeholder="Data de Lançamento">
           </div>
           <div class="form-group">
-            <label for="">Plataforma</label>
-            <select required class="form-control" name="plataforma" id="plataforma">
-              <?php foreach ($plataformas as $plat) { ?>
-                <option <?php if ($plat['id'] == $jogo->id_plataforma) echo 'selected'; ?> value="<?php echo $plat['id'] ?>"><?php echo $plat['nome'] ?></option>
-              <?php } ?>
-            </select>
+            <label for="">Plataformas</label>
+            <?php foreach ($plataformas as $plat) { ?>
+            <div class="checkbox">
+              <label>
+                <input <?php echo (in_array($plat['id'], $plataformasId)) ? 'checked' : '' ?> name="plataformas[]" value="<?php echo $plat['id'] ?>" type="checkbox"> <?php echo $plat['nome']; ?>
+              </label>
+            </div>
+            <?php } ?>
           </div>
 
           <div class="form-group">
-            <label for="">Tipo</label>
-            <select required class="form-control" name="tipo" id="tipo">
-              <?php foreach ($tipos as $tipo) { ?>
-                <option <?php if ($tipo['id'] == $jogo->id_tipo) echo 'selected'; ?> value="<?php echo $tipo['id'] ?>"><?php echo $tipo['nome'] ?></option>
-              <?php } ?>
-            </select>
+             <label for="">Tipo</label>
+             <?php foreach ($tipos as $tipo) { ?>
+            <div class="checkbox">
+              <label>
+                <input <?php echo (in_array($tipo['id'], $tiposId)) ? 'checked' : '' ?> name="tipos[]" value="<?php echo $tipo['id'] ?>" type="checkbox"> <?php echo $tipo['nome']; ?>
+              </label>
+            </div>
+            <?php } ?>
           </div>
           <div class="form-group">
             <label for="">Requisitos</label>
@@ -166,7 +224,7 @@
             <?php foreach ($imagens as $img)  { ?>
             <div class="col-sm-2 col-md-2 img_<?php echo $img['id']  ?>">
               <div class="thumbnail">
-                <img style="height:100px" src="<?php echo $img['caminho'] ?>" alt="...">
+                <img style="height:100px" src="../../<?php echo $img['caminho'] ?>" alt="...">
                 <div class="caption">
                   <p><a href="javascript:" data-id="<?php echo $img['id']; ?>" class="btn btn-primary excluir" role="button">Excluir</a></p>
                 </div>
