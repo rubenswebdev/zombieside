@@ -10,9 +10,9 @@ $(function(){
       $.get('/actions/favoritar.php?acao=desfazer&id=' + id, {}, function(data){
         if (data == 'ok') {
           _this.removeClass("favorito");
-          alert('Removido de seus favoritos com sucesso!');
+          vex.dialog.alert('Removido de seus favoritos com sucesso!');
         } else {
-          alert('Não foi possível completar o pedido!');
+          vex.dialog.alert('Não foi possível completar o pedido!');
         }
       });
 
@@ -21,12 +21,22 @@ $(function(){
       $.get('/actions/favoritar.php?acao=favoritar&id=' + id, {}, function(data){
         if (data == 'ok') {
           _this.addClass("favorito");
-          alert('Favoritado com sucesso!');
+          vex.dialog.alert('Favoritado com sucesso!');
         } else {
-          alert('Não foi possível favoritar!');
+          vex.dialog.alert('Não foi possível favoritar!');
         }
       });
     }
+  }
+
+
+  $('.video_mini').click(updateVideo);
+
+  function updateVideo(){
+    var _this = $(this);
+    var caminho = _this.attr('data-src');
+
+    $('#video_jogo').attr('src', caminho);
   }
 
 });

@@ -1,6 +1,6 @@
  <div class="col-md-4">
     <div class="thumbnail">
-        <img style="height:250px" src="../<?php echo $jogo['imagem']; ?>" alt="Sem imagem" class="img-responsive" />
+        <img style="height:150px" src="../<?php echo $jogo['imagem']; ?>" alt="Sem imagem" class="img-responsive" />
         <div class="caption">
              <h3><?php echo $jogo['nome'] ?> 
                 <?php if(isset($_SESSION['usuario'])) { ?>
@@ -12,7 +12,7 @@
                 echo $lacamento->format('d/m/Y');
             ?></p>
             <p align="center">
-                <a href="http://bootsnipp.com/" class="btn btn-primary btn-block">Ver</a>
+                <a href="/paginas/jogo.php?id=<?php echo $jogo['id_jogo'] ?>" class="btn btn-danger btn-block">Ver</a>
             </p>
         </div>
     </div>

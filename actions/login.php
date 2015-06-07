@@ -35,7 +35,7 @@
                 $prepara->execute(array(':id_usuario' => $usuario->id));
 
                 $favoritos = $prepara->fetchAll(PDO::FETCH_ASSOC);
-
+                $_SESSION['favoritos'] = array();
                 foreach ($favoritos as  $fav) {
                     $_SESSION['favoritos'][] = $fav['id_jogo'];
                 }

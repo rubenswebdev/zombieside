@@ -3,12 +3,15 @@ include '../admin/conexao.php';
 include '../head.php';
 include '../topo.php';
 
+
+$area = 'plataforma';
+
 $id = isset($_GET['id']) ? $_GET['id'] : 0;
 $paginarAcada = 6;
 if((int)$id) {
 
     $sql = 'SELECT j.id AS id_jogo, p.id AS id_plataforma,j.descricao, j.nome, j.requisitos, j.data_lancamento, 
-            p.nome AS nome_plataforma, (SELECT caminho FROM imagem where imagem.id_jogo = j.id LIMIT 1) as imagem
+            p.nome AS nome_plataforma, (SELECT caminho FROM imagem where imagem.id_jogo = j.id AND excluido = false AND ativo = true LIMIT 1) as imagem
             ,(SELECT count(js.id) as total
                 FROM jogo js 
                 INNER JOIN tipo_plataforma_jogo tpjs ON tpjs.id_jogo = js.id

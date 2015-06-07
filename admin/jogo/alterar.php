@@ -41,6 +41,17 @@
     
     $imagens = $preparaImg->fetchAll();
 
+
+    //videos
+    // imagens
+    $sqlVideo = "SELECT * FROM video WHERE id_jogo = :id_jogo AND excluido = false";
+
+    $preparaVideo = $conexao->prepare($sqlVideo);
+    $preparaVideo->execute(array(':id_jogo' => $jogo->id));
+    
+    $videos = $preparaVideo->fetchAll();
+
+
     $data_lancamento = new Datetime($jogo->data_lancamento);
     $data_lancamento = $data_lancamento->format('Y-m-d');
 
@@ -89,6 +100,13 @@
       );
       $prepara->execute($params);
 
+      $sql = "DELETE FROM video where id_jogo = :id_jogo";
+      $prepara = $conexao->prepare($sql);
+      $params = array(
+              ':id_jogo' => $id_jogo
+      );
+      $prepara->execute($params);
+
   
        foreach ($_POST['plataformas'] as $platId) {
             $sql = "INSERT INTO tipo_plataforma_jogo (id_jogo, id_plataforma) 
@@ -118,6 +136,31 @@
             $inserir = $prepara->execute($params);
         }
 
+        if(isset($_POST['videos']) and count($_POST['videos'])) {
+          foreach ($_POST['videos'] as $video) {
+            if($video != '') {
+                $caminho = $video;
+                $data_enviado = new Datetime;
+                $data_enviado = $data_enviado->format('Y-m-d');
+
+                $sql = "INSERT INTO video (data_enviado, caminho, ativo, id_jogo, excluido) 
+                    VALUES (:data_enviado, :caminho, :ativo, :id_jogo, :excluido)";
+                
+                $prepara = $conexao->prepare($sql);
+
+
+                $params = array(
+                                    ':data_enviado' => $data_enviado,
+                                    ':caminho' => $caminho,
+                                    ':ativo' => 'true',
+                                    ':id_jogo' => $id_jogo,
+                                    ':excluido' => 'false'
+                              );
+
+                $inserir = $prepara->execute($params);
+            }
+          }
+        }
         
         //IMAGENS
         foreach ($_FILES["imagens"]["error"] as $key => $error) {
@@ -134,7 +177,7 @@
                 $data_enviado = $data_enviado->format('Y-m-d');
 
                 $paramsImgs = array(
-                                ':slide' => 'true',
+                                ':slide' => 'false',
                                 ':data_enviado' => $data_enviado,
                                 ':caminho' => "uploads/jogos/$name",
                                 ':ativo' => 'true',
@@ -226,11 +269,33 @@
               <div class="thumbnail">
                 <img style="height:100px" src="../../<?php echo $img['caminho'] ?>" alt="...">
                 <div class="caption">
-                  <p><a href="javascript:" data-id="<?php echo $img['id']; ?>" class="btn btn-primary excluir" role="button">Excluir</a></p>
+                  <p>
+                      <a href="javascript:" data-id="<?php echo $img['id']; ?>" class="btn btn-primary excluir" role="button">Excluir</a>
+                      <br><label for="">Slide</label>
+                      <input <?php if($img['slide']) echo 'checked' ;?> type="checkbox" data-id="<?php echo $img['id']; ?>" class="ehslide" value="true" >
+                  </p>
                 </div>
               </div>
             </div>
             <?php } ?>
+          </div>
+
+          <div class="form-group">
+            <label for="">Videos (url Youtube)</label>
+            <div class="form-inline form_video">
+               
+
+                <input class="form-control video_input" name="videos[]" type="text">
+                <button type="button" class="btn btn-success add_video">+</button>
+
+                 <?php 
+                  foreach ($videos as $video) { ?>
+                    <input class="form-control video_input video_<?php echo $video['id'] ?>" name="videos[]" value="<?php echo $video['caminho'] ?>" type="text">
+                    <button type="button" data-pos="<?php echo $video['id'] ?>" class="btn btn-danger remove_video">-</button>
+               <?php   }
+                 ?>
+
+            </div>
           </div>
            
           <div class="checkbox">

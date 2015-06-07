@@ -12,6 +12,7 @@
 
     if (count($_POST)) {
 
+
         $nome = $_POST['nome'];
         $requisitos = $_POST['requisitos'];
 
@@ -67,7 +68,31 @@
             $inserir = $prepara->execute($params);
         }
 
+        if(isset($_POST['videos']) and count($_POST['videos'])) {
+          foreach ($_POST['videos'] as $video) {
+            if($video != '') {
+              $caminho = $video;
+              $data_enviado = new Datetime;
+              $data_enviado = $data_enviado->format('Y-m-d');
 
+              $sql = "INSERT INTO video (data_enviado, caminho, ativo, id_jogo, excluido) 
+                  VALUES (:data_enviado, :caminho, :ativo, :id_jogo, :excluido)";
+              
+              $prepara = $conexao->prepare($sql);
+
+
+              $params = array(
+                                  ':data_enviado' => $data_enviado,
+                                  ':caminho' => $caminho,
+                                  ':ativo' => 'true',
+                                  ':id_jogo' => $id_jogo,
+                                  ':excluido' => 'false'
+                            );
+
+              $inserir = $prepara->execute($params);
+            }
+          }
+        }
         
         //IMAGENS
         foreach ($_FILES["imagens"]["error"] as $key => $error) {
@@ -84,7 +109,7 @@
                 $data_enviado = $data_enviado->format('Y-m-d');
 
                 $paramsImgs = array(
-                                ':slide' => 'true',
+                                ':slide' => 'false',
                                 ':data_enviado' => $data_enviado,
                                 ':caminho' => "uploads/jogos/$name",
                                 ':ativo' => 'true',
@@ -170,6 +195,14 @@
           <div class="form-group">
             <label for="">Imagens</label>
             <input name="imagens[]" type="file" multiple>
+          </div>
+
+          <div class="form-group">
+            <label for="">Videos (url Youtube)</label>
+            <div class="form-inline form_video">
+                <input class="form-control video_input" name="videos[]" type="text">
+                <button type="button" class="btn btn-success add_video">+</button>
+            </div>
           </div>
            
           <div class="checkbox">
