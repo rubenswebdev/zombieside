@@ -16,7 +16,7 @@
     }
     if ($erro == 0) {
             
-        $sql = "SELECT * FROM usuario WHERE login = :login AND ativo = true AND excluido = false AND permissao = 'user' LIMIT 1";
+        $sql = "SELECT * FROM usuario WHERE login = :login AND ativo = true AND excluido = false LIMIT 1";
 
         $prepara = $conexao->prepare($sql);
         $prepara->execute(array(':login' => $login));

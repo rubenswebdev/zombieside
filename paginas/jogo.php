@@ -40,6 +40,16 @@ $prepara->execute($params);
 $imagens = $prepara->fetchAll(PDO::FETCH_ASSOC);
 
 
+//fanarts 
+$sql = "SELECT * FROM fanart WHERE id_jogo = :id AND ativo = true AND excluido = false";
+$prepara = $conexao->prepare($sql);
+
+$params = array(':id' => $id);
+$prepara->execute($params);
+
+$fanarts = $prepara->fetchAll(PDO::FETCH_ASSOC);
+
+
 //videos 
 $sql = "SELECT * FROM video WHERE id_jogo = :id AND ativo = true AND excluido = false";
 $prepara = $conexao->prepare($sql);
@@ -61,6 +71,18 @@ $preparaPl->execute($paramsPl);
 
 $plataformasJogo = $preparaPl->fetchAll(PDO::FETCH_ASSOC);
 
+
+//tipos 
+$sqlPl = "SELECT t.nome FROM jogo_tipo_jogo jtj
+		INNER JOIN tipo_jogo t ON jtj.id_tipo_jogo = t.id WHERE jtj.id_jogo = :id;";
+
+$preparaTip = $conexao->prepare($sqlPl);
+
+$paramsTip = array(':id' => $id);
+$preparaTip->execute($paramsTip);
+
+$tipos = $preparaTip->fetchAll(PDO::FETCH_ASSOC);
+
 /*var_dump($jogo);
 var_dump($plataformasJogo);
 var_dump($videos);
@@ -75,9 +97,35 @@ var_dump($videos);
     <div class="row">
         <?php include '../menu_lateral.php'; ?>
         <div class="col-md-9">
-			<h3><?php echo $jogo->nome ?> <?php if(isset($_SESSION['usuario'])) { ?>
-                <span data-id="<?php echo $jogo->id ?>" class="star <?php if(in_array($jogo->id, $_SESSION['favoritos'])) echo 'favorito' ?>"><i class="fa fa-star"></i></span>
-                <?php } ?></h3>
+        	<div class="row">
+    
+        		<div class="col-md-10">
+        			<h3>
+        				<?php echo $jogo->nome ?> <?php if(isset($_SESSION['usuario'])) { ?>
+		                	<span data-id="<?php echo $jogo->id ?>" class="star <?php if(in_array($jogo->id, $_SESSION['favoritos'])) echo 'favorito' ?>"><i class="fa fa-star"></i></span>
+		                <?php } ?> - 
+		                 <small>
+		                	<?php 
+		                	$ts = array();
+
+		                	foreach ($tipos as $tipo) {
+		                		$ts[] = $tipo['nome'];
+		                	} 
+		                	echo implode(', ', $ts);
+		                	?>
+		                </small>
+	                </h3>
+
+        		</div>
+        		
+        		<?php if (isset($_SESSION['usuario'])) { ?>
+        		<div class="col-md-2">
+                	<a href="/paginas/enviar_fanart.php?id_jogo=<?php echo $jogo->id ?>" class="pull-right btn btn-danger">Enviar FanArt</a>
+        		</div>
+        		<?php } ?>
+        	</div>
+			
+
 
 			    <?php if(count($videos)) { ?>
 			    <a  class="thumbnail">
@@ -113,7 +161,22 @@ var_dump($videos);
 					</div>
 					<?php foreach ($imagens as  $img) { ?>
 						<div class="col-md-3">
-							<a  class="thumbnail">
+							<a  href="../<?php echo $img['caminho'] ?>"   class="thumbnail" data-gallery="imagens">
+						      <img style="height:100px" src="../<?php echo $img['caminho'] ?>" alt="<?php echo $jogo->nome ?>">
+						    </a>
+					    </div>
+					<?php } ?>
+				</div>
+				<?php } ?>
+
+				<?php if(count($fanarts)) { ?>
+				<div id="fanarts" class="row">
+					<div class="col-md-12">
+						<h4>FanArts:</h4>
+					</div>
+					<?php foreach ($fanarts as  $img) { ?>
+						<div class="col-md-3">
+							<a  href="../<?php echo $img['caminho'] ?>"   class="thumbnail" data-gallery="fanarts">
 						      <img style="height:100px" src="../<?php echo $img['caminho'] ?>" alt="<?php echo $jogo->nome ?>">
 						    </a>
 					    </div>
@@ -145,6 +208,53 @@ var_dump($videos);
 						</div>
 					</div>
 				</div>
+				<?php if(isset($_SESSION['usuario'])) { ?>
+				<div class="row">
+					<div class="col-md-12">
+						<form action="../actions/publicar.php" method="POST">
+							<div class="form-group">
+								<textarea 
+									placeholder="Escreva aqui sua opinião sobre o jogo" 
+									name="opiniao" id="opiniao" cols="30" 
+									rows="5"
+									class="form-control"></textarea>
+							</div>
+							<div class="form-group">
+								<button type="submit" class="pull-right btn btn-primary">Publicar</button>
+								<div class="clearfix"></div>
+							</div>
+							<input type="hidden" name="id_jogo" value="<?php echo $jogo->id ?>">
+						</form>
+					</div>
+				</div>
+				<?php } ?>
+				<?php 
+						$sql = "SELECT o.*, u.nome as nome FROM opiniao o 
+						INNER JOIN usuario u on u.id = o.id_usuario
+						WHERE o.id_jogo = :id_jogo AND o.ativo = true AND o.excluido = false
+						ORDER BY id desc";
+
+						$prepara = $conexao->prepare($sql);
+
+						$params = array(':id_jogo' => $jogo->id);
+						$prepara->execute($params);
+
+						$opinioes = $prepara->fetchAll(PDO::FETCH_ASSOC);
+						if(count($opinioes)) {
+				 ?>
+
+				<div class="row">
+					<div class="col-md-12">
+						<h4>Opiniões</h4>
+						<?php foreach ($opinioes as $opiniao) { ?>
+							<div class="well">
+								<small><?php echo $opiniao['nome'] ?> dia <?php echo (new Datetime($opiniao['data_opinado']))->format('d/m/Y') ?> disse:</small> <br>
+								<?php echo $opiniao['texto'] ?>
+							</div>
+						<?php } ?>
+					</div>
+				</div>
+				<?php } ?>
         </div>
    </div>
 </div>

@@ -8,8 +8,7 @@ $paginarAcada = 6;
 $jogos = array();
 if($termo) {
 
-    $sql = 'SELECT j.id AS id_jogo, p.id AS id_plataforma,j.descricao, j.nome, j.requisitos, j.data_lancamento, 
-            p.nome AS nome_plataforma, (SELECT caminho FROM imagem where imagem.id_jogo = j.id LIMIT 1) as imagem
+    $sql = 'SELECT j.id AS id_jogo, j.descricao, j.nome, j.requisitos, j.data_lancamento, (SELECT caminho FROM imagem where imagem.id_jogo = j.id LIMIT 1) as imagem
             ,(SELECT count(js.id) as total
             FROM jogo js 
             INNER JOIN tipo_plataforma_jogo tpjs ON tpjs.id_jogo = js.id
@@ -20,7 +19,7 @@ if($termo) {
             INNER JOIN tipo_plataforma_jogo tpj ON tpj.id_jogo = j.id
             INNER JOIN plataforma p ON p.id = tpj.id_plataforma
             WHERE j.excluido = FALSE AND j.ativo = TRUE AND LOWER(j.nome) LIKE LOWER(:termo)
-            GROUP BY j.id, p.id
+            GROUP BY j.id
             LIMIT :limit OFFSET :offset;';
 
 

@@ -15,5 +15,11 @@
     <li class="<?php if ($_SESSION['menu_ativo'] == 'jogo') echo 'active';?>">
     	<a href="/admin/jogo/listar.php">Jogos<span class="sr-only">(current)</span></a>
     </li>
+     <li class="<?php if ($_SESSION['menu_ativo'] == 'opinioes') echo 'active';?>">
+        <a href="/admin/opinioes/listar.php">Opiniões<span class="sr-only">(current)</span></a>
+    </li>
+     <li class="<?php if ($_SESSION['menu_ativo'] == 'fanarts') echo 'active';?>">
+        <a href="/admin/fanarts/listar.php">FanArts<span class="sr-only">(current)</span></a>
+    </li>
   </ul>
 </div>

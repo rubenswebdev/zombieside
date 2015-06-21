@@ -84,10 +84,65 @@ function listarTipos($conexao, $paginarAcada) {
 
 function listarUsuarios($conexao, $paginarAcada) {
 	//Monta o select
-    $sql = "SELECT *, (SELECT COUNT(*) FROM usuario WHERE excluido = false) as total FROM usuario WHERE excluido = false ORDER BY id";
+    $sql = "SELECT *, (SELECT COUNT(*) FROM usuario WHERE excluido = false) as total FROM usuario WHERE excluido = false ORDER BY id LIMIT :limit OFFSET :offset";
+
+
+    if (isset($_GET['pagina'])) {
+      $offset = $_GET['pagina'] * $paginarAcada;
+    }
+
+    $params = array(
+                ':offset' => (int)@$offset,
+                ':limit' => $paginarAcada
+    );
 
     $prepara = $conexao->prepare($sql);
-    $prepara->execute();
+    $prepara->execute($params);
+
+    return $prepara->fetchAll();
+}
+
+function listarOpinioes($conexao, $paginarAcada) {
+    //Monta o select
+    $sql = "SELECT o.*,u.nome as nome,j.nome as jogo, (SELECT COUNT(*) FROM opiniao WHERE excluido = false) as total FROM opiniao o
+    INNER JOIN usuario u on u.id = o.id_usuario
+    INNER JOIN jogo j on j.id = o.id_jogo
+    WHERE o.excluido = false ORDER BY o.id, o.ativo LIMIT :limit OFFSET :offset";
+
+    if (isset($_GET['pagina'])) {
+      $offset = $_GET['pagina'] * $paginarAcada;
+    }
+
+    $params = array(
+                ':offset' => (int)@$offset,
+                ':limit' => $paginarAcada
+    );
+
+    $prepara = $conexao->prepare($sql);
+    $prepara->execute($params);
+
+    return $prepara->fetchAll();
+}
+
+
+function listarFanarts($conexao, $paginarAcada) {
+    //Monta o select
+    $sql = "SELECT f.*,u.nome as nome,j.nome as jogo, (SELECT COUNT(*) FROM fanart WHERE excluido = false) as total FROM fanart f
+    INNER JOIN usuario u on u.id = f.id_usuario
+    INNER JOIN jogo j on j.id = f.id_jogo
+    WHERE f.excluido = false ORDER BY f.id, f.ativo LIMIT :limit OFFSET :offset";
+
+    if (isset($_GET['pagina'])) {
+      $offset = $_GET['pagina'] * $paginarAcada;
+    }
+
+    $params = array(
+                ':offset' => (int)@$offset,
+                ':limit' => $paginarAcada
+    );
+
+    $prepara = $conexao->prepare($sql);
+    $prepara->execute($params);
 
     return $prepara->fetchAll();
 }

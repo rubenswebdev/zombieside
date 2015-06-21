@@ -1,6 +1,6 @@
 <div class="col-md-3"></div>
 <div class="col-md-9">
-    <form method="GET" action="\paginas\busca.php" class="form-horizontal">
+    <form method="GET" action="/paginas/busca.php" class="form-horizontal">
       <div class="form-group">
         <div class="col-md-11">
           <input required name="termo" value="<?php if(isset($_GET['termo'])) echo $termo; ?>" type="text" class="form-control" placeholder="Digite um Nome">
