@@ -21,6 +21,20 @@
         </div>
         <?php } ?>
 
+
+      <div class="row">
+        <div class="col-md-12">
+          <form action="" method="GET" class="form-inline" role="form">
+            <select name="filtro" id="input" class="form-control">
+              <option <?php if(@$_GET['filtro'] == 't') echo 'selected' ?> value="t">Todos</option>
+              <option <?php if(@$_GET['filtro'] == 'a') echo 'selected' ?> value="a">Aprovados</option>
+              <option <?php if(@$_GET['filtro'] == 'p') echo 'selected' ?> value="p">Pendentes</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+          </form>
+        </div>
+      </div>
+
       <table class="table table-striped table-hover">
           <thead>
               <tr>

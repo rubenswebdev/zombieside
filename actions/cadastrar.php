@@ -68,6 +68,17 @@
                    unset($usuario->senha);//unset para nao exibir a senha na session do usuario
                    $_SESSION['usuario'] = $usuario; //define o usuario logado
 
+                    $sqlFavoritos = "SELECT id_jogo FROM favorito WHERE id_usuario = :id_usuario";
+                    $prepara = $conexao->prepare($sqlFavoritos);
+
+                    $prepara->execute(array(':id_usuario' => $usuario->id));
+
+                    $favoritos = $prepara->fetchAll(PDO::FETCH_ASSOC);
+                    $_SESSION['favoritos'] = array();
+                    foreach ($favoritos as  $fav) {
+                        $_SESSION['favoritos'][] = $fav['id_jogo'];
+                    }
+
                     $_SESSION['class-msg'] = 'success';
                     $_SESSION['msg'] = 'Cadastro realizado com sucesso!';
                    header('Location: /index.php');//redireciona para pagina principal

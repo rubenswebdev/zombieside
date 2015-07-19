@@ -103,11 +103,25 @@ function listarUsuarios($conexao, $paginarAcada) {
 }
 
 function listarOpinioes($conexao, $paginarAcada) {
+    $where = '';
+    if(isset($_GET['filtro'])) {
+        
+        if($_GET['filtro'] == 'a') {
+            $where = ' and o.ativo = true';
+        }
+
+
+        if($_GET['filtro'] == 'p') {
+            $where = ' and o.ativo = false';
+        }
+
+    }
     //Monta o select
     $sql = "SELECT o.*,u.nome as nome,j.nome as jogo, (SELECT COUNT(*) FROM opiniao WHERE excluido = false) as total FROM opiniao o
     INNER JOIN usuario u on u.id = o.id_usuario
     INNER JOIN jogo j on j.id = o.id_jogo
-    WHERE o.excluido = false ORDER BY o.id, o.ativo LIMIT :limit OFFSET :offset";
+    WHERE o.excluido = false {$where} ORDER BY o.id, o.ativo LIMIT :limit OFFSET :offset";
+
 
     if (isset($_GET['pagina'])) {
       $offset = $_GET['pagina'] * $paginarAcada;
@@ -126,11 +140,24 @@ function listarOpinioes($conexao, $paginarAcada) {
 
 
 function listarFanarts($conexao, $paginarAcada) {
+    $where = '';
+    if(isset($_GET['filtro'])) {
+        
+        if($_GET['filtro'] == 'a') {
+            $where = ' and f.ativo = true';
+        }
+
+
+        if($_GET['filtro'] == 'p') {
+            $where = ' and f.ativo = false';
+        }
+
+    }
     //Monta o select
     $sql = "SELECT f.*,u.nome as nome,j.nome as jogo, (SELECT COUNT(*) FROM fanart WHERE excluido = false) as total FROM fanart f
     INNER JOIN usuario u on u.id = f.id_usuario
     INNER JOIN jogo j on j.id = f.id_jogo
-    WHERE f.excluido = false ORDER BY f.id, f.ativo LIMIT :limit OFFSET :offset";
+    WHERE f.excluido = false {$where} ORDER BY f.id, f.ativo LIMIT :limit OFFSET :offset";
 
     if (isset($_GET['pagina'])) {
       $offset = $_GET['pagina'] * $paginarAcada;

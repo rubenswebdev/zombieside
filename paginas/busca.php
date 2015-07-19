@@ -11,8 +11,7 @@ if($termo) {
     $sql = 'SELECT j.id AS id_jogo, j.descricao, j.nome, j.requisitos, j.data_lancamento, (SELECT caminho FROM imagem where imagem.id_jogo = j.id LIMIT 1) as imagem
             ,(SELECT count(js.id) as total
             FROM jogo js 
-            INNER JOIN tipo_plataforma_jogo tpjs ON tpjs.id_jogo = js.id
-            INNER JOIN plataforma ps ON ps.id = tpjs.id_plataforma
+
             WHERE js.excluido = FALSE AND js.ativo = TRUE AND LOWER(js.nome) LIKE LOWER(:termo)
             ) as total
             FROM jogo j 

@@ -48,6 +48,8 @@
 										        <div class="caption">
 										             <h5><?php echo $fanart['titulo'] ?> </h5>
 										             <a href="/actions/desativar_fanart.php?id=<?php echo $fanart['id'] ?> ">Excluir</a>
+										             <br>
+										             <small class="<?php echo  $fanart['ativo'] ? 'text-success' : 'text-danger'  ?>"><?php echo  $fanart['ativo'] ? 'Aprovada' : 'Aguardando moderação' ?></small>
 										        </div>
 										    </div>
 										</div>
